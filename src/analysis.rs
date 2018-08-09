@@ -95,15 +95,15 @@ pub struct Def {
     pub parent: Option<Id>,
     pub value: String,
     pub docs: String,
-    // pub sig: Option<Signature>,
+    pub sig: Option<Signature>,
 }
 
 #[derive(Debug, Clone)]
 pub struct Signature {
-    pub span: Span,
+    //pub span: Span,
     pub text: String,
-    pub ident_start: u32,
-    pub ident_end: u32,
+   // pub ident_start: u32,
+   // pub ident_end: u32,
     pub defs: Vec<SigElement>,
     pub refs: Vec<SigElement>,
 }

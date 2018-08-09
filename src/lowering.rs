@@ -9,7 +9,7 @@
 //! For processing the raw save-analysis data from rustc into the rls
 //! in-memory representation.
 
-use analysis::{Def, Glob, PerCrateAnalysis, Ref};
+use analysis::{Def, Glob, PerCrateAnalysis, Ref, Signature, SigElement};
 use data;
 use raw::{self, RelationKind, CrateId};
 use {AResult, AnalysisHost, Id, Span, NULL};
@@ -282,7 +282,7 @@ impl CrateReader {
                     distro_crate,
                     parent: parent,
                     docs: d.docs,
-                    // sig: d.sig.map(|ref s| self.lower_sig(s, &self.base_dir)),
+                    sig: d.sig.map(|ref s| self.lower_sig(s, &self.base_dir)),
                 };
                 trace!(
                     "record def: {:?}/{:?} ({}): {:?}",
@@ -363,24 +363,24 @@ impl CrateReader {
         }
     }
 
-    // fn lower_sig(&self, raw_sig: &raw::Signature, base_dir: &Path) -> Signature {
-    //     Signature {
-    //         span: lower_span(&raw_sig.span, base_dir, &self.path_rewrite),
-    //         text: raw_sig.text.clone(),
-    //         ident_start: raw_sig.ident_start as u32,
-    //         ident_end: raw_sig.ident_end as u32,
-    //         defs: raw_sig.defs.iter().map(|se| self.lower_sig_element(se)).collect(),
-    //         refs: raw_sig.refs.iter().map(|se| self.lower_sig_element(se)).collect(),
-    //     }
-    // }
+    fn lower_sig(&self, raw_sig: &raw::Signature, base_dir: &Path) -> Signature {
+        Signature {
+            //nvd// span: lower_span(&raw_sig.span, base_dir, &self.path_rewrite),
+            text: raw_sig.text.clone(),
+            //nvd// ident_start: raw_sig.ident_start as u32,
+            //nvd// ident_end: raw_sig.ident_end as u32,
+            defs: raw_sig.defs.iter().map(|se| self.lower_sig_element(se)).collect(),
+            refs: raw_sig.refs.iter().map(|se| self.lower_sig_element(se)).collect(),
+        }
+    }
 
-    // fn lower_sig_element(&self, raw_se: &raw::SigElement) -> SigElement {
-    //     SigElement {
-    //         id: self.id_from_compiler_id(&raw_se.id),
-    //         start: raw_se.start,
-    //         end: raw_se.end,
-    //     }
-    // }
+    fn lower_sig_element(&self, raw_se: &raw::SigElement) -> SigElement {
+        SigElement {
+            id: self.id_from_compiler_id(&raw_se.id),
+            start: raw_se.start,
+            end: raw_se.end,
+        }
+    }
 
     /// Recreates resulting crate-local (`u32`, `u32`) id from compiler
     /// to a global `u64` `Id`, mapping from a local to global crate id.
